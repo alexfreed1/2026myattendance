@@ -1,16 +1,27 @@
 {% extends "base.html" %}
-
 {% block title %}Welcome{% endblock %}
 
 {% block content %}
-<div class="jumbotron text-center">
-    <h1 class="display-4">Welcome to the Unit Attendance Register System</h1>
-    <p class="lead">Thika Technical Training Institute</p>
-    <hr class="my-4">
-    <p>Please select your portal to log in:</p>
-    <p class="d-flex justify-content-center">
-        <a class="btn btn-primary btn-lg mx-2" href="{{ url_for("admin.login") }}" role="button">Admin Portal</a>
-        <a class="btn btn-secondary btn-lg mx-2" href="{{ url_for("lecturer.login") }}" role="button">Lecturer Portal</a>
-    </p>
+<div class="flex flex-col items-center justify-center py-20 text-center">
+    <div class="bg-brand-dark text-white rounded-2xl p-3 mb-6 shadow-lg">
+        <svg class="w-12 h-12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+        </svg>
+    </div>
+    <h1 class="text-4xl font-bold text-gray-900 mb-3">Unit Attendance Register</h1>
+    <p class="text-lg text-gray-500 mb-10">Thika Technical Training Institute</p>
+
+    <div class="flex flex-col sm:flex-row gap-4">
+        <a href="{{ url_for('admin.login') }}"
+           class="flex items-center gap-2 bg-brand-dark hover:bg-brand text-white font-semibold px-8 py-4 rounded-xl shadow transition text-base">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            Admin Portal
+        </a>
+        <a href="{{ url_for('lecturer.login') }}"
+           class="flex items-center gap-2 bg-white hover:bg-gray-50 text-brand-dark font-semibold px-8 py-4 rounded-xl shadow border border-gray-200 transition text-base">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            Lecturer Portal
+        </a>
+    </div>
 </div>
 {% endblock %}

@@ -93,15 +93,6 @@
                                     <input class="form-check-input" type="radio" name="attendance_{{ student.id }}" id="absent_{{ student.id }}" value="{{ student.id }}-Absent" {% if student.attendance_status == "Absent" %}checked{% endif %}>
                                     <label class="form-check-label" for="absent_{{ student.id }}">Absent</label>
                                 </div>
-                                <!-- Use the same name 'attendance' for all radios to easily collect in Flask -->
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="attendance_{{ student.id }}" value="{{ student.id }}-Present" {% if student.attendance_status == "Present" %}checked{% endif %} required>
-                                    <label class="form-check-label">Present</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="attendance_{{ student.id }}" value="{{ student.id }}-Absent" {% if student.attendance_status == "Absent" %}checked{% endif %}>
-                                    <label class="form-check-label">Absent</label>
-                                </div>
                             </td>
                         </tr>
                         {% endfor %}

@@ -5,9 +5,10 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Manage Units</h2>
-    <button class="btn btn-success">Add New Unit</button>
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addUnitModal">Add New Unit</button>
 </div>
-<div class="table-responsive">
+
+<div class="table-responsive mb-5">
     <table class="table table-striped">
         <thead>
             <tr>
@@ -24,12 +25,108 @@
                 <td>{{ unit.code }}</td>
                 <td>{{ unit.title }}</td>
                 <td>
-                    <button class="btn btn-sm btn-primary">Edit</button>
-                    <button class="btn btn-sm btn-danger">Delete</button>
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editUnitModal{{ unit.id }}">Edit</button>
+                    <form method="POST" action="{{ url_for('admin.delete_unit', id=unit.id) }}" class="d-inline" onsubmit="return confirm('Delete this unit?')">
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            <!-- Edit Modal -->
+            <div class="modal fade" id="editUnitModal{{ unit.id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header"><h5 class="modal-title">Edit Unit</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                        <form method="POST" action="{{ url_for('admin.edit_unit', id=unit.id) }}">
+                            <div class="modal-body">
+                                <div class="mb-3"><label class="form-label">Code</label><input type="text" class="form-control" name="code" value="{{ unit.code }}" required></div>
+                                <div class="mb-3"><label class="form-label">Title</label><input type="text" class="form-control" name="title" value="{{ unit.title }}" required></div>
+                            </div>
+                            <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-primary">Save</button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Class-Unit Assignments</h4>
+    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addClassUnitModal">Assign Unit to Class</button>
+</div>
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Class</th>
+                <th>Unit</th>
+                <th>Trainer</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cu in class_units %}
+            <tr>
+                <td>{{ cu.class_name }}</td>
+                <td>{{ cu.unit_title }}</td>
+                <td>{{ cu.trainer_name }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('admin.delete_class_unit', id=cu.id) }}" class="d-inline" onsubmit="return confirm('Remove this assignment?')">
+                        <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                    </form>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+</div>
+
+<!-- Add Unit Modal -->
+<div class="modal fade" id="addUnitModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Add Unit</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <form method="POST" action="{{ url_for('admin.add_unit') }}">
+                <div class="modal-body">
+                    <div class="mb-3"><label class="form-label">Code</label><input type="text" class="form-control" name="code" required></div>
+                    <div class="mb-3"><label class="form-label">Title</label><input type="text" class="form-control" name="title" required></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-success">Add</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Assign Unit to Class Modal -->
+<div class="modal fade" id="addClassUnitModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Assign Unit to Class</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <form method="POST" action="{{ url_for('admin.add_class_unit') }}">
+                <div class="modal-body">
+                    <div class="mb-3"><label class="form-label">Class</label>
+                        <select class="form-select" name="class_id" required>
+                            <option value="">-- Select Class --</option>
+                            {% for c in classes %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3"><label class="form-label">Unit</label>
+                        <select class="form-select" name="unit_id" required>
+                            <option value="">-- Select Unit --</option>
+                            {% for u in units %}<option value="{{ u.id }}">{{ u.title }} ({{ u.code }})</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3"><label class="form-label">Trainer</label>
+                        <select class="form-select" name="trainer_id" required>
+                            <option value="">-- Select Trainer --</option>
+                            {% for t in trainers %}<option value="{{ t.id }}">{{ t.name }}</option>{% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-success">Assign</button></div>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}

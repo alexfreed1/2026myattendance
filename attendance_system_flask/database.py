@@ -1,9 +1,18 @@
+import os
+from pathlib import Path
+from dotenv import load_dotenv
 from supabase import create_client, Client
-from flask import current_app
+
+load_dotenv(Path(__file__).parent / ".env")
 
 def get_supabase_client() -> Client:
-    url = current_app.config.get("SUPABASE_URL")
-    key = current_app.config.get("SUPABASE_KEY")
+    url = os.environ.get('SUPABASE_URL')
+    key = os.environ.get('SUPABASE_KEY')
+    
     if not url or not key:
-        raise ValueError("Supabase URL and Key must be set in config.py or environment variables")
+        raise ValueError("SUPABASE_URL and SUPABASE_KEY must be set in .env file")
+    
     return create_client(url, key)
+
+# Create a singleton instance
+supabase_client = get_supabase_client()

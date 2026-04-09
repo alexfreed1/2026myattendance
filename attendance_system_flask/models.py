@@ -1,13 +1,16 @@
-from database import get_supabase_client
+from database import supabase_client
 
 class BaseModel:
     def __init__(self, table_name):
         self.table_name = table_name
-        self.supabase = get_supabase_client()
+        self.supabase = supabase_client
 
     def get_all(self):
-        response = self.supabase.from_(self.table_name).select("*").execute()
-        return response.data
+        try:
+            response = self.supabase.from_(self.table_name).select("*").execute()
+            return response.data
+        except Exception:
+            return []
 
     def get_by_id(self, id):
         response = self.supabase.from_(self.table_name).select("*").eq("id", id).execute()

@@ -1,93 +1,81 @@
--- Create departments table
-CREATE TABLE IF NOT EXISTS departments (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL
-);
+-- ============================================================
+-- Run this entire script in the Supabase SQL Editor
+-- ============================================================
 
--- Create classes table
-CREATE TABLE IF NOT EXISTS classes (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    department_id INTEGER REFERENCES departments(id)
-);
-
--- Create students table
-CREATE TABLE IF NOT EXISTS students (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    reg_no VARCHAR(50) UNIQUE NOT NULL,
-    class_id INTEGER REFERENCES classes(id)
-);
-
--- Create units table
-CREATE TABLE IF NOT EXISTS units (
-    id SERIAL PRIMARY KEY,
-    code VARCHAR(20) UNIQUE NOT NULL,
-    title VARCHAR(200) NOT NULL
-);
-
--- Create trainers table
-CREATE TABLE IF NOT EXISTS trainers (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL, -- In production, use hashed passwords
-    department_id INTEGER REFERENCES departments(id)
-);
-
--- Create class_units table (Mapping units to classes with trainers)
-CREATE TABLE IF NOT EXISTS class_units (
-    id SERIAL PRIMARY KEY,
-    class_id INTEGER REFERENCES classes(id),
-    unit_id INTEGER REFERENCES units(id),
-    trainer_id INTEGER REFERENCES trainers(id)
-);
-
--- Create attendance table
-CREATE TABLE IF NOT EXISTS attendance (
-    id SERIAL PRIMARY KEY,
-    student_id INTEGER REFERENCES students(id),
-    unit_id INTEGER REFERENCES units(id),
-    trainer_id INTEGER REFERENCES trainers(id),
-    lesson VARCHAR(10) NOT NULL, -- L1, L2, L3, L4
-    week INTEGER NOT NULL, -- 1-52
-    date DATE NOT NULL,
-    status VARCHAR(20) NOT NULL -- Present, Absent
-);
-
--- Create admins table
+-- Create admins table (not created by default)
 CREATE TABLE IF NOT EXISTS admins (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username VARCHAR(50) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL -- In production, use hashed passwords
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Seed data
-INSERT INTO departments (name) VALUES ('Electrical'), ('Mechanical'), ('Civil');
+-- Ensure trainers table has all needed columns
+-- (already exists, just making sure password column is there)
+ALTER TABLE trainers ADD COLUMN IF NOT EXISTS password VARCHAR(255) NOT NULL DEFAULT '';
 
-INSERT INTO classes (name, department_id) VALUES 
-('ELECT-1', 1), 
-('ELECT-2', 1), 
-('MECH-1', 2);
+-- ============================================================
+-- Seed admins (password = admin123)
+-- ============================================================
+INSERT INTO admins (username, password)
+VALUES ('admin', '$2b$12$Ft.yDpoALpZN00vh.SE9ZOSVSwMQxEhXrlQv5FLu7Uro9lvt6HClq')
+ON CONFLICT (username) DO NOTHING;
 
-INSERT INTO students (name, reg_no, class_id) VALUES 
-('Alice Mwangi', 'E001', 1), 
-('Brian Otieno', 'E002', 1), 
-('Catherine Njoroge', 'E003', 2), 
-('Daniel Kimani', 'M001', 3);
+-- ============================================================
+-- Seed trainers (john / john123, mary / mary123)
+-- ============================================================
+INSERT INTO trainers (name, username, password, department_id)
+SELECT 'John Trainer', 'john', '$2b$12$s92rG93.Vf/2h/Ma9T2HK.3ZV08r4phurE10QfKjVr1VQkQ1WPjFK',
+       id FROM departments WHERE name = 'Electrical' LIMIT 1
+ON CONFLICT (username) DO NOTHING;
 
-INSERT INTO units (code, title) VALUES 
-('EE101', 'Circuit Theory'), 
-('EE102', 'Digital Systems'), 
-('ME101', 'Engineering Drawing');
+INSERT INTO trainers (name, username, password, department_id)
+SELECT 'Mary Trainer', 'mary', '$2b$12$Ga5HsQDJ8EqRAV34LZK2w.hP5VwS05JWZqTWBHYujh2nE5Tiijgg.',
+       id FROM departments WHERE name = 'Mechanical' LIMIT 1
+ON CONFLICT (username) DO NOTHING;
 
-INSERT INTO trainers (name, username, password, department_id) VALUES 
-('John Trainer', 'john', 'john123', 1), 
-('Mary Trainer', 'mary', 'mary123', 2);
+-- ============================================================
+-- Seed students
+-- ============================================================
+INSERT INTO students (name, reg_no, class_id)
+SELECT 'Alice Mwangi', 'E001', id FROM classes WHERE name = 'ELECT-1' LIMIT 1
+ON CONFLICT (reg_no) DO NOTHING;
 
-INSERT INTO class_units (class_id, unit_id, trainer_id) VALUES 
-(1, 1, 1), -- ELECT-1, EE101, John
-(1, 2, 1), -- ELECT-1, EE102, John
-(3, 3, 2); -- MECH-1, ME101, Mary
+INSERT INTO students (name, reg_no, class_id)
+SELECT 'Brian Otieno', 'E002', id FROM classes WHERE name = 'ELECT-1' LIMIT 1
+ON CONFLICT (reg_no) DO NOTHING;
 
-INSERT INTO admins (username, password) VALUES ('admin', 'admin123');
+INSERT INTO students (name, reg_no, class_id)
+SELECT 'Catherine Njoroge', 'E003', id FROM classes WHERE name = 'ELECT-2' LIMIT 1
+ON CONFLICT (reg_no) DO NOTHING;
+
+INSERT INTO students (name, reg_no, class_id)
+SELECT 'Daniel Kimani', 'M001', id FROM classes WHERE name = 'MECH-1' LIMIT 1
+ON CONFLICT (reg_no) DO NOTHING;
+
+-- ============================================================
+-- Seed class_units (assign units to classes with trainers)
+-- ============================================================
+INSERT INTO class_units (class_id, unit_id, trainer_id)
+SELECT c.id, u.id, t.id
+FROM classes c, units u, trainers t
+WHERE c.name = 'ELECT-1' AND u.code = 'EE101' AND t.username = 'john'
+AND NOT EXISTS (
+    SELECT 1 FROM class_units WHERE class_id = c.id AND unit_id = u.id
+);
+
+INSERT INTO class_units (class_id, unit_id, trainer_id)
+SELECT c.id, u.id, t.id
+FROM classes c, units u, trainers t
+WHERE c.name = 'ELECT-1' AND u.code = 'EE102' AND t.username = 'john'
+AND NOT EXISTS (
+    SELECT 1 FROM class_units WHERE class_id = c.id AND unit_id = u.id
+);
+
+INSERT INTO class_units (class_id, unit_id, trainer_id)
+SELECT c.id, u.id, t.id
+FROM classes c, units u, trainers t
+WHERE c.name = 'MECH-1' AND u.code = 'ME101' AND t.username = 'mary'
+AND NOT EXISTS (
+    SELECT 1 FROM class_units WHERE class_id = c.id AND unit_id = u.id
+);
