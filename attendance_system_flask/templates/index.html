@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
+<div class="jumbotron text-center">
+    <h1 class="display-4">Welcome to the Unit Attendance Register System</h1>
+    <p class="lead">Thika Technical Training Institute</p>
+    <hr class="my-4">
+    <p>Please select your portal to log in:</p>
+    <p class="d-flex justify-content-center">
+        <a class="btn btn-primary btn-lg mx-2" href="{{ url_for("admin.login") }}" role="button">Admin Portal</a>
+        <a class="btn btn-secondary btn-lg mx-2" href="{{ url_for("lecturer.login") }}" role="button">Lecturer Portal</a>
+    </p>
+</div>
+{% endblock %}

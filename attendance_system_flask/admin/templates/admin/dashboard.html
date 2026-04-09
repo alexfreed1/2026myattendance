@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="mb-4">Admin Dashboard</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-center mb-4 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Manage Students</h5>
+                <p class="card-text">Add and edit student records.</p>
+                <a href="{{ url_for("admin.manage_students") }}" class="btn btn-outline-primary">Go to Students</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center mb-4 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Manage Classes</h5>
+                <p class="card-text">Create and manage class lists.</p>
+                <a href="{{ url_for("admin.manage_classes") }}" class="btn btn-outline-primary">Go to Classes</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center mb-4 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Manage Units</h5>
+                <p class="card-text">Set up units and assign trainers.</p>
+                <a href="{{ url_for("admin.manage_units") }}" class="btn btn-outline-primary">Go to Units</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center mb-4 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Manage Trainers</h5>
+                <p class="card-text">Create and manage trainer accounts.</p>
+                <a href="{{ url_for("admin.manage_trainers") }}" class="btn btn-outline-primary">Go to Trainers</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

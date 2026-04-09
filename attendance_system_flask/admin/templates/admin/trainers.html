@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Trainers{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Manage Trainers</h2>
+    <button class="btn btn-success">Add New Trainer</button>
+</div>
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Department ID</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for trainer in trainers %}
+            <tr>
+                <td>{{ trainer.id }}</td>
+                <td>{{ trainer.name }}</td>
+                <td>{{ trainer.username }}</td>
+                <td>{{ trainer.department_id }}</td>
+                <td>
+                    <button class="btn btn-sm btn-primary">Edit</button>
+                    <button class="btn btn-sm btn-danger">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
